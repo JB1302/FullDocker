@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    container_name: reservasWeb
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/var/www/html
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: reservasSQL
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: appdb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3308:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpReservas
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_USER: appuser
+      PMA_PASSWORD: apppass
+    ports:
+      - "8081:80"   # phpMyAdmin -> http://localhost:8081
+
+volumes:
+  db_data:
